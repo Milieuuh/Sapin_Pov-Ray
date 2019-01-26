@@ -22,7 +22,7 @@
 #declare rCone=0.075;
 
 camera {
-location <1.2*sca,1*sca,0.5>
+location <1.2*sca,1*sca,1.5*sca>
  look_at <0,0,0>
  sky   <0,0,1> // pour avoir le Z en haut
  right <-image_width/image_height,0,0> // pour un repere direct
@@ -91,3 +91,58 @@ plane{
 	 }	
 rotate <0,0,45>
 }
+                                                                                                                                                                    
+                                                                                                                                                                    
+
+#declare A=<0,0,0>;//base pot
+#declare B=<0,0,2>;//haut du pot
+#declare C=1;//rayon externe pot
+#declare D=0.8;//rayon interne pot 
+#declare E=<0,0,0.25>;//fond du pot
+#declare F=<0,0,2.01>;//haut du creux du pot
+#declare G=<0,0,5>;//base premier cone sapin
+#declare H=<0,0,0>;
+        
+   /*     
+difference{  
+    cylinder{
+        A B C
+        pigment{
+            Blue 
+        }    
+    }
+    cylinder{
+        E F D
+        pigment{
+            Blue
+        }
+    }
+}                                                                                                                                                                    
+
+
+merge{*/
+
+#declare P1=<1,1>;//milieu pot
+#declare P2=<1,1.5>;//tg milieu haut pot
+#declare P3=<1,2>;//tg haut pot
+#declare P4=<1.25,2>;//haut pot
+#declare P5=<1,0>;//tg milieu bas pot
+#declare P6=<1,0>;//tg bas pot
+#declare P7=<0,0>;//bas pot
+
+
+lathe {
+    bezier_spline
+    4,
+    P1 P2 P3 P4
+    rotate <90,0,0>
+    pigment{ Blue }
+}
+
+lathe {
+    bezier_spline
+    4,
+    P7 P6 P5 P1
+    rotate <90,0,0>
+    pigment{ Blue }
+} 
