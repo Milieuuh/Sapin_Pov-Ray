@@ -22,7 +22,7 @@
 #declare rCone=0.075;
 
 camera {
-location <1.2*sca,1*sca,5>
+location <1.2*sca,1*sca,0.5>
  look_at <0,0,0>
  sky   <0,0,1> // pour avoir le Z en haut
  right <-image_width/image_height,0,0> // pour un repere direct
@@ -91,28 +91,3 @@ plane{
 	 }	
 rotate <0,0,45>
 }
-                                                                                                                                                                    
-                                                                                                                                                                    
-
-#declare A=<0,0,0>;//base pot
-#declare B=<0,0,2>;//haut du pot
-#declare C=1;//rayon externe pot
-#declare D=0.5;//rayon interne pot 
-#declare E=<0,0,0.25>;//fond du pot       
-        
-        
-difference{  
-    cylinder{
-        A B C
-        pigment{
-            Blue 
-        }    
-    }
-    cylinder{
-        E B D
-        pigment{
-            Red
-        }
-    }
-}                                                                                                                                                                    
-                                                                                                                                                                    
