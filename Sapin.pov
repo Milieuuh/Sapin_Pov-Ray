@@ -7,6 +7,7 @@
 #include "functions.inc" 
 #include "stones1.inc"
 #include "skies.inc"
+#include "choixCouleur.inc"
 
 #declare Pi = 3.1415926535897932384626;
 #declare ciel=1;
@@ -117,6 +118,7 @@ rotate <0,0,45>
 #declare C5b=<0,0,5>;//bas du plus haut cone
 #declare Rf=4;//rayon base feuille du sapin
 #declare d=1;//pour tg guirlande (bézier)
+#declare col=Black;
 
 #macro sapin()
 merge {
@@ -253,14 +255,14 @@ merge {
             m3 sphrtt
             pigment{
                 lumiere
-                transmit 0.5
+                //transmit 0.5
             }
         }
-    }
+    }/*
     light_source{
         m3
         color lumiere
-    }
+    }*/
 
         
         
@@ -308,12 +310,15 @@ merge {
     #end
 #end
 
-
-sapin()
-guirlande(5,10,0, 3, Blue)
-
-guirlandeL(12,8, 165,4, Green, Yellow)
-
+union{
+    sapin()
+    merge{
+    
+		Couleur(clock, col)
+        guirlande(5,10,0, 3, Blue)
+        guirlandeL(12,8, 165,4, SpringGreen, col)
+    }
+}
 
 /*
 
