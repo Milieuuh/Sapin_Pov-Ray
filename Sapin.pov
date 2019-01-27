@@ -314,9 +314,9 @@ union{
     merge{
     
         #declare col=Black;
-		Couleur(clock*99, col)
+		Couleur(int(clock*99), col)
         guirlande(5,10,0, 3, Blue)
-        guirlandeL(12,8, 165,4, SpringGreen, col)
+        guirlandeL(15,5, 165,4, SpringGreen, col)
     }
 }
 
