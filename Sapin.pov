@@ -119,7 +119,7 @@ rotate <0,0,45>
 #declare Rf=4;//rayon base feuille du sapin
 #declare d=1;//pour tg guirlande (bézier)
 
-#macro sapin()
+#macro sapin(teinte)
 merge {
     lathe {
         bezier_spline
@@ -138,61 +138,71 @@ merge {
     }
     difference{
         cone{
-            C1b Rf
+            C1b Rf*0.5
             C1h 0
-            pigment{Green}
+            pigment{rgb teinte}
+            scale <age, age, age>
         }        
         cylinder{
             A B R
             pigment{Brown}
+            scale <age, age, age>
         }
     
     }
     difference{
         cone{
-            C2b Rf
+            C2b Rf*0.625
             C2h 0
-            pigment{Green}
+            pigment{rgb teinte}
+            scale <age, age, age>
         }        
         cylinder{
             A B R
             pigment{Brown}
+            scale <age, age, age>
         }
     
     }
     difference{
         cone{
-            C3b Rf
+            C3b Rf*0.75
             C3h 0
-            pigment{Green}
+            pigment{rgb teinte}
+            scale <age, age, age>
         }        
         cylinder{
             A B R
             pigment{Brown}
+            scale <age, age, age>
         }
     
     }
     difference{
         cone{
-            C4b Rf
+            C4b Rf*0.875
             C4h 0
-            pigment{Green}
+            pigment{rgb teinte}
+            scale <age, age, age>
         }        
         cylinder{
             A B R
             pigment{Brown}
+            scale <age, age, age>
         }
     
     }
     difference{
         cone{
-            C5b 4
+            C5b Rf
             C5h 0
-            pigment{Green}
+            pigment{rgb teinte}
+            scale <age, age, age>
         }        
         cylinder{
             A B R
             pigment{Brown}
+            scale <age, age, age>
         }
     
     }
@@ -200,15 +210,20 @@ merge {
     cylinder{
         A B R
         pigment{Brown}
+        scale <age, age, age>
     }
     
 }
 #end
 
+#macro epaisseur(hauteur, var)
+    #declare var=(15-(hauteur-5))/15*0.5*Rf+0.5*Rf
+#end
+
 
 
 #macro courbe(B0,B1,B2,B3, couleur)
-	#local n=100;//precision(nbre de cylindre)
+	#local n=10;//precision(nbre de cylindre)
 	#local r=0.10; // rayon des guirlande
 	#local tab1=array[n+1];
 
@@ -230,11 +245,15 @@ merge {
 //ATTENTION difference angle <=Pi !!!!
     #declare TgD=0.75*AgD+0.25*AgF;//tg début courbe correspond à 1/4 de l'angle parcourue
     #declare TgF=0.25*AgD+0.75*AgF;//tg fin courbe correspond à 3/4 de l'angle parcourue
-    #declare m0=<Rf*cos(AgD), Rf*sin(AgD), HD>;
+    #declare RD=0;
+    epaisseur(HD,RD);//rayon en début du morceau
+    #declare RM=0;epaisseur(HD*0.5+0.5*HF,RM);//rayon au milieu du morceau
+    #declare RF=0;epaisseur(HF,RF);//rayon en fin du morceau
+    #declare m0=<RD*cos(AgD), RD*sin(AgD), HD>;
     #declare esp=1+(0.118*2/Pi)*(AgF-AgD);//1.118 correspond a sqrt(1+0.5^2)
-    #declare m1=<Rf*esp*cos(TgD), Rf*esp*sin(TgD), HD*0.5+HF*0.5>;
-    #declare m2=<Rf*esp*cos(TgF), Rf*esp*sin(TgF), HD*0.5+HF*0.5>;
-    #declare m3=<Rf*cos(AgF), Rf*sin(AgF), HF>;
+    #declare m1=<RM*esp*cos(TgD), RM*esp*sin(TgD), HD*0.5+HF*0.5>;
+    #declare m2=<RM*esp*cos(TgF), RM*esp*sin(TgF), HD*0.5+HF*0.5>;
+    #declare m3=<RF*cos(AgF), RF*sin(AgF), HF>;
     courbe(m0,m1,m2,m3, couleur)
 #end
 
@@ -242,11 +261,15 @@ merge {
 //ATTENTION difference angle <=Pi !!!!
     #declare TgD=0.75*AgD+0.25*AgF;//tg début courbe correspond à 1/4 de l'angle parcourue
     #declare TgF=0.25*AgD+0.75*AgF;//tg fin courbe correspond à 3/4 de l'angle parcourue
-    #declare m0=<Rf*cos(AgD), Rf*sin(AgD), HD>;
+    #declare RD=0;
+    epaisseur(HD,RD);//rayon en début du morceau
+    #declare RM=0;epaisseur(HD*0.5+0.5*HF,RM);//rayon au milieu du morceau
+    #declare RF=0;epaisseur(HF,RF);//rayon en fin du morceau
+    #declare m0=<RD*cos(AgD), RD*sin(AgD), HD>;
     #declare esp=1+(0.118*2/Pi)*(AgF-AgD);//1.118 correspond a sqrt(1+0.5^2)
-    #declare m1=<Rf*esp*cos(TgD), Rf*esp*sin(TgD), HD*0.5+HF*0.5>;
-    #declare m2=<Rf*esp*cos(TgF), Rf*esp*sin(TgF), HD*0.5+HF*0.5>;
-    #declare m3=<Rf*cos(AgF), Rf*sin(AgF), HF>;
+    #declare m1=<RM*esp*cos(TgD), RM*esp*sin(TgD), HD*0.5+HF*0.5>;
+    #declare m2=<RM*esp*cos(TgF), RM*esp*sin(TgF), HD*0.5+HF*0.5>;
+    #declare m3=<RF*cos(AgF), RF*sin(AgF), HF>;
     #declare sphrtt=0.2;//rayon des sphere
     merge {
         courbe(m0,m1,m2,m3, couleur)
@@ -299,7 +322,7 @@ merge {
 
 //idéal étant de faire 1/4 de tour par courbe
     #declare T=T;//nombre de tour de sapin avec la guirlande
-    #declare O=50;//distance en degrée entre chaque orbe
+    #declare O=30;//distance en degrée entre chaque orbe
     #declare Or=O*Pi/180;//parce que povray prend des radians et pas des degrés
     #declare nbre=int(T*360/O);//nombre de tour dans le for arrondie a l'inférieur
     #declare delta=(F-D)/nbre;//delta de hauteur entre chaque morceau
@@ -309,16 +332,63 @@ merge {
     #end
 #end
 
+
+#declare temp=int(clock*20);
+#declare age=0.1;
+#if ( temp<5 )
+  #declare age=temp/4;
+#else
+    #declare age=1;
+#end
+
+#declare teinte = <0,1,0>;
+#if(temp = 15)
+    #declare teinte = <0.5,0.5,0>;
+#end
+#if(temp = 16)
+    #declare teinte = <0.2,0.4,0>;
+    #declare Rf=3.75;
+#end
+#if(temp = 17)
+    #declare teinte = <0.3,0.4,0>;
+    #declare Rf=3.5;
+#end
+#if(temp = 18)
+    #declare teinte = <0.4,0.4,0>;
+    #declare Rf=3.25;
+#end
+#if(temp = 19)
+    #declare teinte = <0.5,0.4,0>;
+    #declare Rf=3;
+#end
+#if(temp = 20)
+    #declare teinte = <0.6,0.4,0>;
+    #declare Rf=3;
+#end
+
+
 union{
-    sapin()
-    merge{
+    sapin(teinte)
+    #if(temp>=6 & temp <16)
+        merge{
+            #declare col=White;
+            #if(temp=6 | temp=8 | temp=10 | temp=12 | temp=14 )
+                #declare col=Red;
+            #else
+                #declare col=Yellow;
+            #end
+            guirlande(5,10,0, 3, Blue)
+            guirlandeL(15,10, 165,2, SpringGreen, col)
+        }
+    #end
     
-        #declare col=Black;
-		Couleur(int(clock*99), col)
-        guirlande(5,10,0, 3, Blue)
-        guirlandeL(15,5, 165,4, SpringGreen, col)
-    }
+    #if(temp >15)
+        guirlande(0,0.25,0,3, Blue)
+        guirlandeL(0.2,0.35, 165,2, SpringGreen, White)
+    #end
 }
+
+
 
 /*
 
@@ -338,3 +408,6 @@ union{
 
 //courbe(<Rf*cos(test1),Rf*sin(test1),5>,<Rf*cos(test1),Rf*0.5*sin(test2),5>,<Rf*0.5*cos(test1),Rf*sin(test2),5>,<Rf*cos(test2),Rf*sin(test2),5>)
 courbe(m1,m2,m3,m4)*/
+
+
+//====================== OPTION DE LANCEMENT +KFI1 +KFF21 =====================================
