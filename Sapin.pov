@@ -204,10 +204,9 @@ merge {
 }
 #end
 
-sapin()
 
 
-#macro courbe(B0,B1,B2,B3)
+#macro courbe(B0,B1,B2,B3, couleur)
 	#local n=100;//precision(nbre de cylindre)
 	#local r=0.10; // rayon des guirlande
 	#local tab1=array[n+1];
@@ -220,13 +219,13 @@ sapin()
 		cylinder {
 			tab1[j] tab1[j+1] r
 			pigment {
-				color Black
+				color couleur
 			}
 		}
 	#end
 #end
 
-#macro morceau(AgD, AgF, HD, HF)
+#macro morceau(AgD, AgF, HD, HF, couleur)
 //ATTENTION difference angle <=Pi !!!!
     #declare TgD=0.75*AgD+0.25*AgF;//tg début courbe correspond à 1/4 de l'angle parcourue
     #declare TgF=0.25*AgD+0.75*AgF;//tg fin courbe correspond à 3/4 de l'angle parcourue
@@ -235,32 +234,86 @@ sapin()
     #declare m1=<Rf*esp*cos(TgD), Rf*esp*sin(TgD), HD*0.5+HF*0.5>;
     #declare m2=<Rf*esp*cos(TgF), Rf*esp*sin(TgF), HD*0.5+HF*0.5>;
     #declare m3=<Rf*cos(AgF), Rf*sin(AgF), HF>;
-    courbe(m0,m1,m2,m3)
+    courbe(m0,m1,m2,m3, couleur)
+#end
+
+#macro morceauS(AgD, AgF, HD, HF, couleur, lumiere)
+//ATTENTION difference angle <=Pi !!!!
+    #declare TgD=0.75*AgD+0.25*AgF;//tg début courbe correspond à 1/4 de l'angle parcourue
+    #declare TgF=0.25*AgD+0.75*AgF;//tg fin courbe correspond à 3/4 de l'angle parcourue
+    #declare m0=<Rf*cos(AgD), Rf*sin(AgD), HD>;
+    #declare esp=1+(0.118*2/Pi)*(AgF-AgD);//1.118 correspond a sqrt(1+0.5^2)
+    #declare m1=<Rf*esp*cos(TgD), Rf*esp*sin(TgD), HD*0.5+HF*0.5>;
+    #declare m2=<Rf*esp*cos(TgF), Rf*esp*sin(TgF), HD*0.5+HF*0.5>;
+    #declare m3=<Rf*cos(AgF), Rf*sin(AgF), HF>;
+    #declare sphrtt=0.2;//rayon des sphere
+    merge {
+        courbe(m0,m1,m2,m3, couleur)
+        sphere{
+            m3 sphrtt
+            pigment{
+                lumiere
+                transmit 0.5
+            }
+        }
+    }
+    light_source{
+        m3
+        color lumiere
+    }
+
+        
+        
+        
 #end
 
 
 
 
 
-#macro guirlande(D,F,Ad)
+#macro guirlande(D,F,Ad,T,couleur)
 //D : hauteur départ(min 5)
 //F : hauteur final(max ~15)
 //Ad : angle départ autour sapin (base cylindrique) en degré
 
 
 //idéal étant de faire 1/4 de tour par courbe
-    #declare T=5;//nombre de tour de sapin avec la guirlande
+    #declare T=T;//nombre de tour de sapin avec la guirlande
     #declare O=50;//distance en degrée entre chaque orbe
     #declare Or=O*Pi/180;//parce que povray prend des radians et pas des degrés
     #declare nbre=int(T*360/O);//nombre de tour dans le for arrondie a l'inférieur
     #declare delta=(F-D)/nbre;//delta de hauteur entre chaque morceau
     #for (i,0,nbre-1)
-        morceau(Or*i, Or*(i+1),D+i*delta, D+(i+1)*delta)
+        morceau(Or*i, Or*(i+1),D+i*delta, D+(i+1)*delta, couleur)
     #end
 #end
 
 
-guirlande(5,10,0)
+
+#macro guirlandeL(D,F,Ad,T,couleur, lumiere)
+//D : hauteur départ(min 5)
+//F : hauteur final(max ~15)
+//Ad : angle départ autour sapin (base cylindrique) en degré
+
+
+//idéal étant de faire 1/4 de tour par courbe
+    #declare T=T;//nombre de tour de sapin avec la guirlande
+    #declare O=50;//distance en degrée entre chaque orbe
+    #declare Or=O*Pi/180;//parce que povray prend des radians et pas des degrés
+    #declare nbre=int(T*360/O);//nombre de tour dans le for arrondie a l'inférieur
+    #declare delta=(F-D)/nbre;//delta de hauteur entre chaque morceau
+    #for (i,0,nbre-1)
+        morceauS(Or*i, Or*(i+1),D+i*delta, D+(i+1)*delta, couleur, lumiere)
+        
+    #end
+#end
+
+
+sapin()
+guirlande(5,10,0, 3, Blue)
+
+guirlandeL(12,8, 165,4, Green, Yellow)
+
 
 /*
 
