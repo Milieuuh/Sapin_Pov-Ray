@@ -10,7 +10,7 @@
 
 #declare Pi = 3.1415926535897932384626;
 #declare ciel=1;
-#declare sca=3;
+#declare sca=15;
 
 // axes
 #declare Font="cyrvetic.ttf"
@@ -22,8 +22,8 @@
 #declare rCone=0.075;
 
 camera {
-location <1.2*sca,1*sca,1.5*sca>
- look_at <0,0,0>
+location <1.2*sca,1*sca,1*sca>
+ look_at <0,0,10>
  sky   <0,0,1> // pour avoir le Z en haut
  right <-image_width/image_height,0,0> // pour un repere direct
 }
@@ -77,13 +77,13 @@ union{
     pigment {color Coul} finish {diffuse diffu}
 }// fin union
 #end // fin macro fleche
-
+/*
 
 //sca,rot,trans
 flecheDiffuseNom(O3,I,Red,0.75,rCyl,rCone,1,"X",0.35,<90,0,0>,<0.5,0,0.125>)
 flecheDiffuseNom(O3,J,Green,0.75,rCyl,rCone,1,"Y",0.35,<90,0,-45>,<0.0,0.75,0.1250>)
 flecheDiffuseNom(O3,K,Blue,0.75,rCyl,rCone,1,"Z",0.35,<90,0,180>,<-0.20,0.0,0.750>)
-
+*/
 plane{
 -z 150
   pigment{ brick rgbt<1.0,1.,1.0,0.250>, rgbt<0.750,.5,0.0,0.850>  
@@ -92,35 +92,8 @@ plane{
 rotate <0,0,45>
 }
                                                                                                                                                                     
-                                                                                                                                                                    
-
-#declare A=<0,0,0>;//base pot
-#declare B=<0,0,2>;//haut du pot
-#declare C=1;//rayon externe pot
-#declare D=0.8;//rayon interne pot 
-#declare E=<0,0,0.25>;//fond du pot
-#declare F=<0,0,2.01>;//haut du creux du pot
-#declare G=<0,0,5>;//base premier cone sapin
-#declare H=<0,0,0>;
-        
-   /*     
-difference{  
-    cylinder{
-        A B C
-        pigment{
-            Blue 
-        }    
-    }
-    cylinder{
-        E F D
-        pigment{
-            Blue
-        }
-    }
-}                                                                                                                                                                    
 
 
-merge{*/
 
 #declare P1=<1,1>;//milieu pot
 #declare P2=<1,1.5>;//tg milieu haut pot
@@ -129,20 +102,141 @@ merge{*/
 #declare P5=<1,0>;//tg milieu bas pot
 #declare P6=<1,0>;//tg bas pot
 #declare P7=<0,0>;//bas pot
+#declare R=0.5;//rayon du sapin
+#declare A=<0,0,0>;//base du tronc
+#declare B=<0,0,15>;//haut du tronc
+#declare C1h=<0,0,20>;//haut du plus haut cone
+#declare C1b=<0,0,15>;//bas du plus haut cone
+#declare C2h=<0,0,17.5>;//haut du plus haut cone
+#declare C2b=<0,0,12.5>;//bas du plus haut cone
+#declare C3h=<0,0,15>;//haut du plus haut cone
+#declare C3b=<0,0,10>;//bas du plus haut cone
+#declare C4h=<0,0,12.5>;//haut du plus haut cone
+#declare C4b=<0,0,7.5>;//bas du plus haut cone
+#declare C5h=<0,0,10>;//haut du plus haut cone
+#declare C5b=<0,0,5>;//bas du plus haut cone
+#declare Rf=4;//rayon base feuille du sapin
+#declare d=1;//pour tg guirlande (bézier)
 
-
-lathe {
-    bezier_spline
-    4,
-    P1 P2 P3 P4
-    rotate <90,0,0>
-    pigment{ Blue }
+#macro sapin()
+merge {
+    lathe {
+        bezier_spline
+        4,
+        P1 P2 P3 P4
+        rotate <90,0,0>
+        pigment{ Blue }
+    }
+    
+    lathe {
+        bezier_spline
+        4,
+        P7 P6 P5 P1
+        rotate <90,0,0>
+        pigment{ Blue }
+    }
+    difference{
+        cone{
+            C1b Rf
+            C1h 0
+            pigment{Green}
+        }        
+        cylinder{
+            A B R
+            pigment{Brown}
+        }
+    
+    }
+    difference{
+        cone{
+            C2b Rf
+            C2h 0
+            pigment{Green}
+        }        
+        cylinder{
+            A B R
+            pigment{Brown}
+        }
+    
+    }
+    difference{
+        cone{
+            C3b Rf
+            C3h 0
+            pigment{Green}
+        }        
+        cylinder{
+            A B R
+            pigment{Brown}
+        }
+    
+    }
+    difference{
+        cone{
+            C4b Rf
+            C4h 0
+            pigment{Green}
+        }        
+        cylinder{
+            A B R
+            pigment{Brown}
+        }
+    
+    }
+    difference{
+        cone{
+            C5b 4
+            C5h 0
+            pigment{Green}
+        }        
+        cylinder{
+            A B R
+            pigment{Brown}
+        }
+    
+    }
+            
+    cylinder{
+        A B R
+        pigment{Brown}
+    }
+    
 }
+#end
 
-lathe {
-    bezier_spline
-    4,
-    P7 P6 P5 P1
-    rotate <90,0,0>
-    pigment{ Blue }
-} 
+sapin()
+
+
+#macro courbe(B0,B1,B2,B3)
+	#local n=100;//precision(nbre de cylindre)
+	#local r=0.10; // rayon des guirlande
+	#local tab1=array[n+1];
+
+	#for (i,0,n)
+		#local fract=i/n;
+		#declare tab1[i]=pow(1-fract,3)*B0+3*fract*pow(1-fract,2)*B1+3*fract*fract*B2*(1-fract)+B3*pow(fract,3);	
+	#end
+	#for (j,0,n-1)
+		cylinder {
+			tab1[j] tab1[j+1] r
+			pigment {
+				color Black
+			}
+		}
+	#end
+#end
+
+#macro guirlande(D,F,Ad)
+//D : hauteur départ(min 5)
+//F : hauteur final(max ~15)
+//Ad : angle départ autour sapin (base cylindrique) en degré
+
+
+//idéal étant de faire 1/4 de tour par courbe
+#declare T=3;//nombre de tour de sapin avec la guirlande
+
+#end
+
+
+//courbe(<Rf,0,5>,<Rf,Rf*0.5,5>,<Rf*0.5,Rf,5>,<0,Rf,5>)
+courbe(<Rf*cos(0),0,5>,<Rf*cos(0),Rf*0.5,5>,<Rf*0.5,Rf*sin(Pi/2),5>,<Rf*cos(Pi/2),Rf*sin(Pi/2),5>)

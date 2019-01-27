@@ -115,12 +115,10 @@ rotate <0,0,45>
 #declare C4b=<0,0,7.5>;//bas du plus haut cone
 #declare C5h=<0,0,10>;//haut du plus haut cone
 #declare C5b=<0,0,5>;//bas du plus haut cone
+#declare Rf=4;//rayon base feuille du sapin
+#declare d=1;//pour tg guirlande (bézier)
 
-
-
-
-// CSG merge, merge all of shapes 1...N
-// like 'union', but melted together so no overlap seam lines inside
+#macro sapin()
 merge {
     lathe {
         bezier_spline
@@ -139,7 +137,7 @@ merge {
     }
     difference{
         cone{
-            C1b 4
+            C1b Rf
             C1h 0
             pigment{Green}
         }        
@@ -151,7 +149,7 @@ merge {
     }
     difference{
         cone{
-            C2b 4
+            C2b Rf
             C2h 0
             pigment{Green}
         }        
@@ -163,7 +161,7 @@ merge {
     }
     difference{
         cone{
-            C3b 4
+            C3b Rf
             C3h 0
             pigment{Green}
         }        
@@ -175,7 +173,7 @@ merge {
     }
     difference{
         cone{
-            C4b 4
+            C4b Rf
             C4h 0
             pigment{Green}
         }        
@@ -204,4 +202,81 @@ merge {
     }
     
 }
+#end
 
+sapin()
+
+
+#macro courbe(B0,B1,B2,B3)
+	#local n=100;//precision(nbre de cylindre)
+	#local r=0.10; // rayon des guirlande
+	#local tab1=array[n+1];
+
+	#for (i,0,n)
+		#local fract=i/n;
+		#declare tab1[i]=pow(1-fract,3)*B0+3*fract*pow(1-fract,2)*B1+3*fract*fract*B2*(1-fract)+B3*pow(fract,3);	
+	#end
+	#for (j,0,n-1)
+		cylinder {
+			tab1[j] tab1[j+1] r
+			pigment {
+				color Black
+			}
+		}
+	#end
+#end
+
+#macro morceau(AgD, AgF, HD, HF)
+//ATTENTION difference angle <=Pi !!!!
+    #declare TgD=0.75*AgD+0.25*AgF;//tg début courbe correspond à 1/4 de l'angle parcourue
+    #declare TgF=0.25*AgD+0.75*AgF;//tg fin courbe correspond à 3/4 de l'angle parcourue
+    #declare m0=<Rf*cos(AgD), Rf*sin(AgD), HD>;
+    #declare esp=1+(0.118*2/Pi)*(AgF-AgD);//1.118 correspond a sqrt(1+0.5^2)
+    #declare m1=<Rf*esp*cos(TgD), Rf*esp*sin(TgD), HD*0.5+HF*0.5>;
+    #declare m2=<Rf*esp*cos(TgF), Rf*esp*sin(TgF), HD*0.5+HF*0.5>;
+    #declare m3=<Rf*cos(AgF), Rf*sin(AgF), HF>;
+    courbe(m0,m1,m2,m3)
+#end
+
+
+
+
+
+#macro guirlande(D,F,Ad)
+//D : hauteur départ(min 5)
+//F : hauteur final(max ~15)
+//Ad : angle départ autour sapin (base cylindrique) en degré
+
+
+//idéal étant de faire 1/4 de tour par courbe
+    #declare T=5;//nombre de tour de sapin avec la guirlande
+    #declare O=50;//distance en degrée entre chaque orbe
+    #declare Or=O*Pi/180;//parce que povray prend des radians et pas des degrés
+    #declare nbre=int(T*360/O);//nombre de tour dans le for arrondie a l'inférieur
+    #declare delta=(F-D)/nbre;//delta de hauteur entre chaque morceau
+    #for (i,0,nbre-1)
+        morceau(Or*i, Or*(i+1),D+i*delta, D+(i+1)*delta)
+    #end
+#end
+
+
+guirlande(5,10,0)
+
+/*
+
+//courbe(<Rf,0,5>,<Rf,Rf*0.5,5>,<Rf*0.5,Rf,5>,<0,Rf,5>)
+#declare test1=0;
+#declare test2=Pi;
+#declare test3=0.75*test1+0.25*test2;
+#declare test4=0.75*test2+0.25*test1;
+
+#declare m1=<Rf*cos(test1)      ,Rf*sin(test1)      ,5>;
+
+#declare m2=<Rf*1.118*cos(test3),Rf*1.118*sin(test3),5.5>;
+
+#declare m3=<Rf*1.118*cos(test4),Rf*1.118*sin(test4),5.5>;
+
+#declare m4=<Rf*cos(test2)      ,Rf*sin(test2),6>;
+
+//courbe(<Rf*cos(test1),Rf*sin(test1),5>,<Rf*cos(test1),Rf*0.5*sin(test2),5>,<Rf*0.5*cos(test1),Rf*sin(test2),5>,<Rf*cos(test2),Rf*sin(test2),5>)
+courbe(m1,m2,m3,m4)*/
