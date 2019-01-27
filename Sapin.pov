@@ -118,7 +118,6 @@ rotate <0,0,45>
 #declare C5b=<0,0,5>;//bas du plus haut cone
 #declare Rf=4;//rayon base feuille du sapin
 #declare d=1;//pour tg guirlande (bézier)
-#declare col=Black;
 
 #macro sapin()
 merge {
@@ -254,7 +253,7 @@ merge {
         sphere{
             m3 sphrtt
             pigment{
-                lumiere
+                color lumiere
                 //transmit 0.5
             }
         }
@@ -314,7 +313,8 @@ union{
     sapin()
     merge{
     
-		Couleur(clock, col)
+        #declare col=Black;
+		Couleur(clock*99, col)
         guirlande(5,10,0, 3, Blue)
         guirlandeL(12,8, 165,4, SpringGreen, col)
     }
